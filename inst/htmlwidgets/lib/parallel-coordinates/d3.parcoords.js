@@ -652,7 +652,7 @@ function single_path(d, ctx) {
   var isPreviousPointValid = false;
   for (var i = 0; i < entries.length; i++) {
     var p = entries[i]
-    if (typeof d[p.key] !== 'undefined' && __.dimensions[p.key].yscale(d[p.key]) !== 'undefined') {
+    if (typeof d[p.key] !== 'undefined' && d[p.key] !== null) {
       if (isPreviousPointValid) {
         ctx.lineTo(position(p.key), __.dimensions[p.key].yscale(d[p.key]));
       } else {
