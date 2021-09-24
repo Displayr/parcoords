@@ -647,26 +647,23 @@ function paths(data, ctx) {
 	ctx.stroke();
 };
 
-// returns the y-position just beyond the separating null value line
-function getNullPosition() {
-	if (__.nullValueSeparator=="bottom") {
-		return h()+1;
-	} else if (__.nullValueSeparator=="top") {
-		return 1;
-	} else {
-		console.log("A value is NULL, but nullValueSeparator is not set; set it to 'bottom' or 'top'.");
-	}
-	return h()+1;
-};
-
 function single_path(d, ctx) {
-	d3.entries(__.dimensions).forEach(function(p, i) {  //p isn't really p
-		if (i == 0) {
-			ctx.moveTo(position(p.key), typeof d[p.key] =='undefined' ? getNullPosition() : __.dimensions[p.key].yscale(d[p.key]));
-		} else {
-			ctx.lineTo(position(p.key), typeof d[p.key] =='undefined' ? getNullPosition() : __.dimensions[p.key].yscale(d[p.key]));
-		}
-	});
+  var entries = d3.entries(__.dimensions);
+  var isPreviousPointValid = false;
+  for (var i = 0; i < entries.length; i++) {
+    var p = entries[i]
+    if (typeof d[p.key] !== 'undefined' && __.dimensions[p.key].yscale(d[p.key]) !== 'undefined') {
+      if (isPreviousPointValid) {
+        ctx.lineTo(position(p.key), __.dimensions[p.key].yscale(d[p.key]));
+      } else {
+        ctx.moveTo(position(p.key), __.dimensions[p.key].yscale(d[p.key]));
+      }
+      isPreviousPointValid = true;
+    }
+    else {
+      isPreviousPointValid = false;
+    }
+  }
 };
 
 function path_brushed(d, i) {
