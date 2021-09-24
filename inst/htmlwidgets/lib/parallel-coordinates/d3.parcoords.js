@@ -199,6 +199,10 @@ pc.autoscale = function() {
   // yscale
   var defaultScales = {
     "date": function(k) {
+      if (k === null) {
+        return undefined
+      }
+
       var extent = d3.extent(__.data, function(d) {
         return d[k] ? d[k].getTime() : null;
       });
@@ -215,6 +219,10 @@ pc.autoscale = function() {
         .range(getRange());
     },
     "number": function(k) {
+      if (k === null) {
+        return undefined
+      }
+
       var extent = d3.extent(__.data, function(d) { return +d[k]; });
 
       // special case if single value
@@ -385,11 +393,17 @@ pc.toType = function(v) {
 };
 
 // try to coerce to number before returning type
-pc.toTypeCoerceNumbers = function(v) {
-  if ((parseFloat(v) == v) && (v != null)) {
-    return "number";
+pc.toTypeCoerceNumbers = function(data, col) {
+  for (var i = 0; i < data.length; i++) {
+    var v = data[i][col]
+    if (v !== null) {
+      if ((parseFloat(v) == v) && (v != null)) {
+        return "number";
+      }
+      return pc.toType(v);
+    }
   }
-  return pc.toType(v);
+  throw new Error("All values for a case are missing");
 };
 
 // attempt to determine types of each dimension based on first row of data
@@ -397,7 +411,7 @@ pc.detectDimensionTypes = function(data) {
   var types = {};
   d3.keys(data[0])
     .forEach(function(col) {
-      types[isNaN(Number(col)) ? col : parseInt(col)] = pc.toTypeCoerceNumbers(data[0][col]);
+      types[isNaN(Number(col)) ? col : parseInt(col)] = pc.toTypeCoerceNumbers(data, col);
     });
   return types;
 };
