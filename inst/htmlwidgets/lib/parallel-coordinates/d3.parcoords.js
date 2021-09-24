@@ -403,7 +403,7 @@ pc.toTypeCoerceNumbers = function(data, col) {
       return pc.toType(v);
     }
   }
-  throw new Error("All values for a case are missing");
+  throw new Error("All values for a dimension are missing");
 };
 
 // attempt to determine types of each dimension based on first row of data
